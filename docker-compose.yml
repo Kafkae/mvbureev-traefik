@@ -19,6 +19,10 @@ services:
     networks:
       - mvbureev
 
+volumes:
+    https-portal-data:
+    driver: local
+
 networks:
   mvbureev:
     driver: bridge
