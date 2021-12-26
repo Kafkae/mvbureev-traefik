@@ -15,7 +15,7 @@ services:
       WEBSOCKET: 'true'
     restart: always
     volumes: 
-      - https-portal-data: /var/lib/https-portal
+      - https-portal-data:/var/lib/https-portal
     networks:
       - mvbureev
 
