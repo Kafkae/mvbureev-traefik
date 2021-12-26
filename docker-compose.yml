@@ -1,27 +1,22 @@
-version: "3.8"
-
+version: "3.7"
 services:
-  https-portal:
-    image: steveltn/https-portal:latest
+  caddy:
+    image: lucaslorentz/caddy-docker-proxy:ci-alpine
     ports:
-      - '80:80'
-      - '443:443'
+      - 80:80
+      - 443:443
     environment:
-      DOMAINS: 'mvbureev.ru => http://landing:3000, test.mvbureev.ru => http://test:3000'
-      # STAGE: 'production' # Don't use production until staging works
-      FORCE_RENEW: 'true'
-      CLIENT_MAX_BODY_SIZE: 5G
-      GZIP: 'on'
-      WEBSOCKET: 'true'
-    restart: always
-    volumes: 
-      - https-portal-data:/var/lib/https-portal
+      - CADDY_INGRESS_NETWORKS=caddy
     networks:
-      - mvbureev
-
-volumes:
-  https-portal-data:
+      - caddy
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - caddy_data:/data
+    restart: unless-stopped
 
 networks:
-  mvbureev:
+  caddy:
     external: true
+
+volumes:
+  caddy_data: {}
