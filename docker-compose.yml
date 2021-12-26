@@ -23,6 +23,6 @@ volumes:
   https-portal-data:
 
 networks:
-    default:
-        external:
-            name: mvbureev
+  default:
+    external: true
+    name: mvbureev
