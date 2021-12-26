@@ -7,7 +7,7 @@ services:
       - '80:80'
       - '443:443'
     environment:
-      DOMAINS: ${DOMAINS}
+      DOMAINS: 'mvbureev.ru => https://landing:80, test.mvbureev.ru => http://test:80'
       # STAGE: 'production' # Don't use production until staging works
       FORCE_RENEW: 'true'
       CLIENT_MAX_BODY_SIZE: 5G
