@@ -1,0 +1,15 @@
+docker-build:
+  stage: build
+  image: docker/compose
+  tags:
+    - mvbureev
+  before_script:
+    - ls -lsa
+    - docker info
+    - docker-compose version
+    - docker-compose config
+    - docker-compose ps
+  script:
+    - docker-compose pull
+    - docker-compose build
+    - docker-compose up -d
