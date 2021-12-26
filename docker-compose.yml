@@ -23,5 +23,6 @@ volumes:
   https-portal-data:
 
 networks:
-  mvbureev:
-    driver: bridge
+    default:
+        external:
+            name: mvbureev
