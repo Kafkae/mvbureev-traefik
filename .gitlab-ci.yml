@@ -1,4 +1,6 @@
 image: docker/compose
+tags:
+  - mvbureev
 
 stages:
   - build
@@ -6,24 +8,18 @@ stages:
 
 build:
   stage: build
-  tags:
-    - mvbureev
   before_script:
     - ls -lsa
     - docker info
     - docker-compose version
     - docker-compose config
-    - docker-compose ps
-  script:
-    - docker-compose up -d
-
-deploy:
-  stage: deploy
-  tags:
-    - mvbureev
-  before_script:
-    - docker-compose ps
   script:
     - docker-compose pull
     - docker-compose build
+
+deploy:
+  stage: deploy
+  before_script:
+    - docker-compose ps
+  script:
     - docker-compose up -d
