@@ -24,8 +24,6 @@ services:
       NGINX_PROXY_CONTAINER: "reverse-proxy"
       DEFAULT_EMAIL: "mvbureev@gmail.com"
     restart: "always"
-    volumes_from:
-      - reverse-proxy
     volumes:
       - certs:/etc/nginx/certs:rw
       - acme:/etc/acme.sh
