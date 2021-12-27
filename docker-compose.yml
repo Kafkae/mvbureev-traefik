@@ -1,43 +1,49 @@
 version: "3.7"
 
 services:
-    reverse-proxy:
-        image: "jwilder/nginx-proxy:latest"
-        container_name: "reverse-proxy"
-        volumes:
-            - "html:/usr/share/nginx/html"
-            - "dhparam:/etc/nginx/dhparam"
-            - "vhost:/etc/nginx/vhost.d"
-            - "certs:/etc/nginx/certs"
-            - "/run/docker.sock:/tmp/docker.sock:ro"
-        restart: "always"
-        networks: 
-            - "mvbureev-network"
-        ports:
-            - "80:80"
-            - "443:443"
-    letsencrypt:
-        image: "jrcs/letsencrypt-nginx-proxy-companion:latest"
-        container_name: "letsencrypt-helper"
-        volumes:
-            - "html:/usr/share/nginx/html"
-            - "dhparam:/etc/nginx/dhparam"
-            - "vhost:/etc/nginx/vhost.d"
-            - "certs:/etc/nginx/certs"
-            - "/run/docker.sock:/var/run/docker.sock:ro"
-        environment:
-            NGINX_PROXY_CONTAINER: "reverse-proxy"
-            DEFAULT_EMAIL: "mvbureev@gmail.com"
-        restart: "always"
-        depends_on:
-            - "reverse-proxy"
-        networks: 
-            - "mvbureev-network"
+  reverse-proxy:
+    image: "jwilder/nginx-proxy:alpine"
+    container_name: "reverse-proxy"
+    volumes:
+      - html:/usr/share/nginx/html
+      - dhparam:/etc/nginx/dhparam
+      - vhost:/etc/nginx/vhost.d
+      - certs:/etc/nginx/certs
+      - /run/docker.sock:/tmp/docker.sock:ro
+    restart: "always"
+    networks: 
+      - "mvbureev-network"
+    ports:
+      - "80:80"
+      - "443:443"
+
+  acme-companion:
+    image: nginxproxy/acme-companion
+    container_name: nginx-proxy-acme
+    environment:
+      NGINX_PROXY_CONTAINER: "reverse-proxy"
+      DEFAULT_EMAIL: "mvbureev@gmail.com"
+    restart: "always"
+    volumes_from:
+      - reverse-proxy
+    volumes:
+      - certs:/etc/nginx/certs:rw
+      - acme:/etc/acme.sh
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - html:/usr/share/nginx/html
+      - dhparam:/etc/nginx/dhparam
+      - vhost:/etc/nginx/vhost.d
+    depends_on:
+      - "reverse-proxy"
+    networks: 
+      - "mvbureev-network"
 
 volumes:
-  certs:
-  html:
+  conf:
   vhost:
+  certs:
+  acme:
+  html:
   dhparam:
 
 networks:
