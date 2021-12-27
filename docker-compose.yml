@@ -5,6 +5,7 @@ services:
     image: "nginxproxy/nginx-proxy:latest"
     container_name: "reverse-proxy"
     volumes:
+      - "nginx:/etc/nginx"
       - "conf:/etc/nginx/conf.d"
       - "html:/usr/share/nginx/html"
       - "vhost:/etc/nginx/vhost.d"
@@ -25,6 +26,7 @@ services:
       DEFAULT_EMAIL: "mvbureev@gmail.com"
     restart: "always"
     volumes:
+      - "nginx:/etc/nginx"
       - "conf:/etc/nginx/conf.d"
       - "html:/usr/share/nginx/html"
       - "vhost:/etc/nginx/vhost.d"
@@ -37,6 +39,7 @@ services:
       - "mvbureev-network"
 
 volumes:
+  nginx:
   conf:
   vhost:
   certs:
