@@ -7,10 +7,8 @@ services:
     volumes:
       - "html:/usr/share/nginx/html"
       - "vhost:/etc/nginx/vhost.d"
-      - "certs:/etc/nginx/certs"
+      - "certs:/etc/nginx/certs:ro"
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
-      # - "/run/docker.sock:/tmp/docker.sock:ro"
-      # - "dhparam:/etc/nginx/dhparam"
     restart: "always"
     networks: 
       - "mvbureev-network"
@@ -31,7 +29,6 @@ services:
       - "certs:/etc/nginx/certs:rw"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
       - "acme:/etc/acme.sh"
-      # - "dhparam:/etc/nginx/dhparam"
     depends_on:
       - "reverse-proxy"
     networks: 
@@ -43,7 +40,6 @@ volumes:
   certs:
   acme:
   html:
-  # dhparam:
 
 networks:
   mvbureev-network:
