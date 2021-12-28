@@ -6,10 +6,12 @@ services:
     container_name: "reverse-proxy"
     volumes:
       - "nginx:/etc/nginx"
-      - "conf:/etc/nginx/conf.d"
       - "html:/usr/share/nginx/html"
       - "vhost:/etc/nginx/vhost.d"
       - "certs:/etc/nginx/certs:ro"
+      - "./nginx.conf:/etc/nginx/nginx.conf"
+      - "./nginx.tmpl:/app/nginx.tmpl"
+      - "./config:/etc/nginx/config"
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
     restart: "always"
     networks: 
@@ -26,13 +28,15 @@ services:
       DEFAULT_EMAIL: "mvbureev@gmail.com"
     restart: "always"
     volumes:
+      - "acme:/etc/acme.sh"
       - "nginx:/etc/nginx"
-      - "conf:/etc/nginx/conf.d"
       - "html:/usr/share/nginx/html"
       - "vhost:/etc/nginx/vhost.d"
       - "certs:/etc/nginx/certs:rw"
+      - "./nginx.conf:/etc/nginx/nginx.conf"
+      - "./nginx.tmpl:/app/nginx.tmpl"
+      - "./config:/etc/nginx/config"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-      - "acme:/etc/acme.sh"
     depends_on:
       - "reverse-proxy"
     networks: 
@@ -40,7 +44,6 @@ services:
 
 volumes:
   nginx:
-  conf:
   vhost:
   certs:
   acme:
