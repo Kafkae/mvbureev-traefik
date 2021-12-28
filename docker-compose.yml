@@ -4,62 +4,66 @@ services:
   reverse-proxy:
     image: "nginxproxy/nginx-proxy:latest"
     container_name: "reverse-proxy"
-    volumes:
-      - "conf:/etc/nginx/conf.d"
-      - "html:/usr/share/nginx/html"
-      - "vhost:/etc/nginx/vhost.d"
-      - "certs:/etc/nginx/certs:ro"
-      - "./nginx.conf:/etc/nginx/nginx.conf"
-      - "./nginx.tmpl:/app/nginx.tmpl"
-      - "./config:/etc/nginx/config"
-      - "/var/run/docker.sock:/tmp/docker.sock:ro"
     restart: "always"
     networks: 
       - "mvbureev-network"
     ports:
       - "80:80"
       - "443:443"
-
-  docker-gen:
-    image: "nginxproxy/docker-gen"
-    container_name: "nginx-proxy-gen"
-    command: "-notify-sighup nginx-proxy -watch /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf"
     volumes:
       - "conf:/etc/nginx/conf.d"
       - "html:/usr/share/nginx/html"
       - "vhost:/etc/nginx/vhost.d"
       - "certs:/etc/nginx/certs:ro"
-      - "./nginx.conf:/etc/nginx/nginx.conf"
       # - "./nginx.tmpl:/app/nginx.tmpl"
-      - "./nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro"
+      - "./nginx.conf:/etc/nginx/nginx.conf"
       - "./config:/etc/nginx/config"
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
+
+  docker-gen:
+    image: "nginxproxy/docker-gen"
+    container_name: "nginx-proxy-gen"
+    restart: "always"
+    command: "-notify-sighup nginx-proxy -watch /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf"
+    depends_on:
+      - "reverse-proxy"
     labels:
       - "com.github.jrcs.letsencrypt_nginx_proxy_companion.docker_gen"
     networks: 
       - "mvbureev-network"
+    volumes:
+      - "conf:/etc/nginx/conf.d"
+      - "html:/usr/share/nginx/html"
+      - "vhost:/etc/nginx/vhost.d"
+      - "certs:/etc/nginx/certs:ro"
+      # - "./nginx.tmpl:/app/nginx.tmpl"
+      - "./nginx.conf:/etc/nginx/nginx.conf"
+      - "./nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro"
+      - "./config:/etc/nginx/config"
+      - "/var/run/docker.sock:/tmp/docker.sock:ro"
 
   nginx-proxy-acme:
     image: "nginxproxy/acme-companion:latest"
     container_name: "nginx-proxy-acme"
+    restart: "always"
     environment:
       NGINX_PROXY_CONTAINER: "reverse-proxy"
       DEFAULT_EMAIL: "mvbureev@gmail.com"
-    restart: "always"
+    depends_on:
+      - "reverse-proxy"
+      - "docker-gen"
+    networks: 
+      - "mvbureev-network"
     volumes:
       - "acme:/etc/acme.sh"
       - "conf:/etc/nginx/conf.d"
       - "html:/usr/share/nginx/html"
       - "vhost:/etc/nginx/vhost.d"
       - "certs:/etc/nginx/certs:rw"
+      # - "./nginx.tmpl:/app/nginx.tmpl"
       - "./nginx.conf:/etc/nginx/nginx.conf"
-      - "./nginx.tmpl:/app/nginx.tmpl"
       - "./config:/etc/nginx/config"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
-    depends_on:
-      - "reverse-proxy"
-    networks: 
-      - "mvbureev-network"
 
 volumes:
   conf:
