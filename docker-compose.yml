@@ -1,68 +1,29 @@
-version: "3.7"
+version: '3.7'
 
 services:
-  reverse-proxy:
-    image: "nginxproxy/nginx-proxy:latest"
-    container_name: "reverse-proxy"
-    restart: "always"
-    networks: 
-      - "mvbureev-network"
+  traefik:
+    image: traefik:v2.5
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
     ports:
-      - "80:80"
-      - "443:443"
+      - 80:80
+      - 443:443
+      # - 8082:8082
     volumes:
-      - "conf:/etc/nginx/conf.d"
-      - "vhost:/etc/nginx/vhost.d"
-      - "certs:/etc/nginx/certs:ro"
-      - "html:/usr/share/nginx/html"
-      - "/var/run/docker.sock:/tmp/docker.sock:ro"
-
-  docker-gen:
-    image: "nginxproxy/docker-gen"
-    container_name: "nginx-proxy-gen"
-    restart: "always"
-    command: "-notify-sighup nginx-proxy -watch /etc/docker-gen/templates/nginx.tmpl /etc/nginx/conf.d/default.conf"
-    depends_on:
-      - "reverse-proxy"
+      - /etc/localtime:/etc/localtime:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./config/traefik.yml:/traefik.yml:ro
+      - ./config/traefik_dynamic.toml:/traefik_dynamic.toml
+      - ./config/acme.json:/acme.json
     labels:
-      - "com.github.jrcs.letsencrypt_nginx_proxy_companion.docker_gen"
-    networks: 
-      - "mvbureev-network"
-    volumes:
-      - "conf:/etc/nginx/conf.d"
-      - "vhost:/etc/nginx/vhost.d"
-      - "certs:/etc/nginx/certs:ro"
-      - "html:/usr/share/nginx/html"
-      - "./templates:/etc/docker-gen/templates:ro"
-      - "/var/run/docker.sock:/tmp/docker.sock:ro"
-
-  nginx-proxy-acme:
-    image: "nginxproxy/acme-companion:latest"
-    container_name: "nginx-proxy-acme"
-    restart: "always"
-    environment:
-      NGINX_PROXY_CONTAINER: "reverse-proxy"
-      DEFAULT_EMAIL: "mvbureev@gmail.com"
-    depends_on:
-      - "reverse-proxy"
-      - "docker-gen"
-    networks: 
-      - "mvbureev-network"
-    volumes:
-      - "conf:/etc/nginx/conf.d"
-      - "vhost:/etc/nginx/vhost.d"
-      - "certs:/etc/nginx/certs:rw"
-      - "acme:/etc/acme.sh"
-      - "html:/usr/share/nginx/html"
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
-
-volumes:
-  conf:
-  vhost:
-  certs:
-  acme:
-  html:
-
-networks:
-  mvbureev-network:
-    external: true
+      - traefik.enable=true
+      - traefik.http.routers.traefik.entrypoints=https
+      - traefik.http.routers.traefik.rule=Host(`traefik.mvbureev.ru`)
+      - traefik.http.routers.traefik.tls=true
+      - traefik.http.routers.traefik.tls.certresolver=lets-encrypt
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.services.traefik-traefik.loadbalancer.server.port=888
+      - traefik.http.middlewares.traefik-auth.basicauth.users=admin:${TRAEFIK_ADMIN_PANEL_ENCRYPTED_PASSWORD}
+      - traefik.http.routers.traefik.middlewares=traefik-auth

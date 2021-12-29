@@ -1,0 +1,39 @@
+[entryPoints]
+  [entryPoints.web]
+    address = ":80"
+    [entryPoints.web.http.redirections.entryPoint]
+      to = "websecure"
+      scheme = "https"
+  [entryPoints.websecure]
+    address = ":443"
+  # [entryPoints.metrics]
+  #   address = ":8082"
+
+[http]
+  [http.routers.http-catchall]
+    rule = "Host(`{host:.+}`)"
+    entrypoints = "http"
+    middlewares = "redirect-to-https"
+  [http.middlewares.redirect-to-https.redirectScheme]
+    scheme = "https"
+    permanent = false
+
+[api]
+  dashboard = true
+
+[certificatesResolvers.lets-encrypt.acme]
+  email = "mvbureev@gmail.com"
+  storage = "acme.json"
+  caServer = "https://acme-staging-v02.api.letsencrypt.org/directory"
+  [certificatesResolvers.lets-encrypt.acme.tlsChallenge]
+  [certificatesResolvers.lets-encrypt.acme.httpChallenge]
+    entryPoint = "http"
+
+[providers.docker]
+  watch = true
+  network = "web"
+  endpoint = "unix:///var/run/docker.sock"
+  exposedByDefault = false
+
+[providers.file]
+  filename = "traefik_dynamic.toml"
