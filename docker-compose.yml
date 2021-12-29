@@ -5,7 +5,7 @@ services:
     image: "nginxproxy/nginx-proxy:latest"
     container_name: "reverse-proxy"
     restart: "always"
-    command: "bash -c 'touch /etc/nginx/conf.d/user.conf'"
+    # command: "bash -c 'touch /etc/nginx/conf.d/user.conf'"
     networks: 
       - "mvbureev-network"
     ports:
