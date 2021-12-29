@@ -5,18 +5,20 @@ services:
     image: traefik:v2.5
     container_name: traefik
     restart: unless-stopped
+    command: --api
     security_opt:
       - no-new-privileges:true
     ports:
       - 80:80
       - 443:443
+      - 8080:8080
       # - 8082:8082
     volumes:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ./config/traefik.yml:/traefik.yml:ro
-      - ./config/traefik_dynamic.toml:/traefik_dynamic.toml
-      - ./config/acme.json:/acme.json
+      - ./data/traefik.toml:/traefik.toml:ro
+      - ./data/traefik_dynamic.toml:/traefik_dynamic.toml
+      - ./data/acme.json:/acme.json
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik.entrypoints=https
