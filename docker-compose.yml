@@ -11,7 +11,6 @@ services:
       - "80:80"
       - "443:443"
     volumes:
-      - "./nginx:/etc/nginx"
       - "./config:/etc/nginx/config"
       - "conf:/etc/nginx/conf.d"
       - "vhost:/etc/nginx/vhost.d"
@@ -31,7 +30,6 @@ services:
     networks: 
       - "mvbureev-network"
     volumes:
-      - "./nginx:/etc/nginx"
       - "./config:/etc/nginx/config"
       - "./templates:/etc/docker-gen/templates:ro"
       - "conf:/etc/nginx/conf.d"
@@ -53,7 +51,6 @@ services:
     networks: 
       - "mvbureev-network"
     volumes:
-      - "./nginx:/etc/nginx"
       - "./config:/etc/nginx/config"
       - "acme:/etc/acme.sh"
       - "conf:/etc/nginx/conf.d"
