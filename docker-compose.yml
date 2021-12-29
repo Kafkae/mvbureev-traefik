@@ -3,6 +3,8 @@ version: "3.7"
 services:
   traefik:
     image: traefik:2.4.8
+    networks:
+      - proxy
     command:
       - --entrypoints.http.address=:80
       - --entrypoints.https.address=:443
@@ -33,8 +35,16 @@ services:
 
   # whoami:
   #   image: containous/whoami
+  #   networks:
+  #     - proxy
   #   labels:
   #     - traefik.http.routers.https.rule=Host(`whoami.${DOMAIN}`)
   #     - traefik.http.routers.https.entrypoints=https
   #     - traefik.http.routers.https.tls=true
   #     - traefik.http.routers.https.tls.certresolver=${CERT_RESOLVER}
+  #     - traefik.docker.network=proxy
+
+
+networks:
+  proxy:
+    external: true
