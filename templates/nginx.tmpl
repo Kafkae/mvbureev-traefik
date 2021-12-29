@@ -322,6 +322,12 @@ server {
 		break;
 	}
 
+    location = /50x.html {
+      root /usr/share/nginx/html/;
+      index error.html
+      internal;
+    }
+
 	location / {
 		{{ if eq $external_https_port "443" }}
 		return 301 https://$host$request_uri;
@@ -376,6 +382,12 @@ server {
 	{{ else if (exists "/etc/nginx/vhost.d/default") }}
 	include /etc/nginx/vhost.d/default;
 	{{ end }}
+
+    location = /50x.html {
+      root /usr/share/nginx/html/;
+      index error.html
+      internal;
+    }
 
 	location / {
 		{{ if eq $proto "uwsgi" }}
