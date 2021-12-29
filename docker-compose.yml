@@ -36,7 +36,7 @@ services:
       - "html:/usr/share/nginx/html"
       - "vhost:/etc/nginx/vhost.d"
       - "certs:/etc/nginx/certs:ro"
-      - "./nginx.tmpl:/etc/docker-gen/templates/nginx.tmpl:ro"
+      - "./templates:/etc/docker-gen/templates:ro"
       - "./config:/etc/nginx/config"
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
 
