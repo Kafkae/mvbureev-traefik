@@ -2,7 +2,7 @@ version: '3.7'
 
 services:
   traefik:
-    image: traefik:v2.5
+    image: traefik:2.5
     container_name: traefik
     restart: unless-stopped
     command: --api
@@ -17,9 +17,9 @@ services:
       - /etc/localtime:/etc/localtime:ro
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ${CONTAINERPATH}/traefik:/etc/traefik
-      - ${CONTAINERPATH}/traefik/acme.json:/acme.json
-      - ${CONTAINERPATH}/traefik/traefik.yml:/traefik.yml 
-      - ${CONTAINERPATH}/traefik/dynamic_config.yml:/config.yml:ro
+      # - ${CONTAINERPATH}/traefik/acme/acme.json:/acme.json
+      # - ${CONTAINERPATH}/traefik/traefik.yml:/traefik.yml 
+      # - ${CONTAINERPATH}/traefik/config.yml:/config.yml:ro
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik.entrypoints=https
