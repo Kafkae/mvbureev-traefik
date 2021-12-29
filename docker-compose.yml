@@ -1,32 +1,40 @@
-version: '3.7'
-
+version: "3.7"
 services:
+
   traefik:
-    image: traefik:2.5
-    container_name: traefik
-    restart: unless-stopped
-    command: --api
-    security_opt:
-      - no-new-privileges:true
+    image: traefik:2.4.8
+    command:
+      - --entrypoints.http.address=:80
+      - --entrypoints.https.address=:443
+      - --providers.docker=true
+      - --api=true
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge=true
+      - --certificatesresolvers.letsencrypt.acme.httpchallenge.entrypoint=http
+      - --certificatesresolvers.letsencrypt.acme.email=${EMAIL}
+      - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
+    labels:
+      - traefik.http.routers.to-https.rule=HostRegexp(`{host:.+}`)
+      - traefik.http.routers.to-https.entrypoints=http
+      - traefik.http.routers.to-https.middlewares=to-https
+      - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
+      - traefik.http.routers.traefik.entrypoints=https
+      - traefik.http.routers.traefik.middlewares=auth
+      - traefik.http.routers.traefik.service=api@internal
+      - traefik.http.routers.traefik.tls=true
+      - traefik.http.routers.traefik.tls.certresolver=${CERT_RESOLVER}
+      - traefik.http.middlewares.to-https.redirectscheme.scheme=https
+      - traefik.http.middlewares.auth.basicauth.users=${TRAEFIK_USER}:${TRAEFIK_PASSWORD_HASH}
     ports:
       - 80:80
       - 443:443
-      - 8080:8080
-      # - 8082:8082
     volumes:
-      - /etc/localtime:/etc/localtime:ro
+      - ./data/letsencrypt:/letsencrypt
       - /var/run/docker.sock:/var/run/docker.sock:ro
-      - ${CONTAINERPATH}/traefik:/etc/traefik
-      # - ${CONTAINERPATH}/traefik/acme/acme.json:/acme.json
-      # - ${CONTAINERPATH}/traefik/traefik.yml:/traefik.yml 
-      # - ${CONTAINERPATH}/traefik/config.yml:/config.yml:ro
+
+  whoami:
+    image: containous/whoami
     labels:
-      - traefik.enable=true
-      - traefik.http.routers.traefik.entrypoints=https
-      - traefik.http.routers.traefik.rule=Host(`traefik.mvbureev.ru`)
-      - traefik.http.routers.traefik.tls=true
-      - traefik.http.routers.traefik.tls.certresolver=lets-encrypt
-      - traefik.http.routers.traefik.service=api@internal
-      - traefik.http.services.traefik-traefik.loadbalancer.server.port=888
-      - traefik.http.middlewares.traefik-auth.basicauth.users=admin:${TRAEFIK_ADMIN_PANEL_ENCRYPTED_PASSWORD}
-      - traefik.http.routers.traefik.middlewares=traefik-auth
+      - traefik.http.routers.https.rule=Host(`whoami.${DOMAIN}`)
+      - traefik.http.routers.https.entrypoints=https
+      - traefik.http.routers.https.tls=true
+      - traefik.http.routers.https.tls.certresolver=${CERT_RESOLVER}
