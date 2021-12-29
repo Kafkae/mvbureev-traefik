@@ -48,51 +48,6 @@
 	{{ end }}
 {{ end }}
 
-# ERRORS
-map $status $status_text {
-  400 'Bad Request';
-  401 'Unauthorized';
-  402 'Payment Required';
-  403 'Forbidden';
-  404 'Not Found';
-  405 'Method Not Allowed';
-  406 'Not Acceptable';
-  407 'Proxy Authentication Required';
-  408 'Request Timeout';
-  409 'Conflict';
-  410 'Gone';
-  411 'Length Required';
-  412 'Precondition Failed';
-  413 'Payload Too Large';
-  414 'URI Too Long';
-  415 'Unsupported Media Type';
-  416 'Range Not Satisfiable';
-  417 'Expectation Failed';
-  418 'I\'m a teapot';
-  421 'Misdirected Request';
-  422 'Unprocessable Entity';
-  423 'Locked';
-  424 'Failed Dependency';
-  425 'Too Early';
-  426 'Upgrade Required';
-  428 'Precondition Required';
-  429 'Too Many Requests';
-  431 'Request Header Fields Too Large';
-  451 'Unavailable For Legal Reasons';
-  500 'Internal Server Error';
-  501 'Not Implemented';
-  502 'Bad Gateway';
-  503 'Service Unavailable';
-  504 'Gateway Timeout';
-  505 'HTTP Version Not Supported';
-  506 'Variant Also Negotiates';
-  507 'Insufficient Storage';
-  508 'Loop Detected';
-  510 'Not Extended';
-  511 'Network Authentication Required';
-  default 'Something is wrong';
-}
-
 # If we receive X-Forwarded-Proto, pass it through; otherwise, pass along the
 # scheme used to connect to this server
 map $http_x_forwarded_proto $proxy_x_forwarded_proto {
@@ -164,36 +119,81 @@ proxy_set_header X-Forwarded-Port $proxy_x_forwarded_port;
 proxy_set_header Proxy "";
 {{ end }}
 
+# ERRORS
+map $status $status_text {
+  400 'Bad Request';
+  401 'Unauthorized';
+  402 'Payment Required';
+  403 'Forbidden';
+  404 'Not Found';
+  405 'Method Not Allowed';
+  406 'Not Acceptable';
+  407 'Proxy Authentication Required';
+  408 'Request Timeout';
+  409 'Conflict';
+  410 'Gone';
+  411 'Length Required';
+  412 'Precondition Failed';
+  413 'Payload Too Large';
+  414 'URI Too Long';
+  415 'Unsupported Media Type';
+  416 'Range Not Satisfiable';
+  417 'Expectation Failed';
+  418 'I\'m a teapot';
+  421 'Misdirected Request';
+  422 'Unprocessable Entity';
+  423 'Locked';
+  424 'Failed Dependency';
+  425 'Too Early';
+  426 'Upgrade Required';
+  428 'Precondition Required';
+  429 'Too Many Requests';
+  431 'Request Header Fields Too Large';
+  451 'Unavailable For Legal Reasons';
+  500 'Internal Server Error';
+  501 'Not Implemented';
+  502 'Bad Gateway';
+  503 'Service Unavailable';
+  504 'Gateway Timeout';
+  505 'HTTP Version Not Supported';
+  506 'Variant Also Negotiates';
+  507 'Insufficient Storage';
+  508 'Loop Detected';
+  510 'Not Extended';
+  511 'Network Authentication Required';
+  default 'Something is wrong';
+}
+
 {{ $access_log := (or (and (not $.Env.DISABLE_ACCESS_LOGS) "access_log /var/log/nginx/access.log vhost;") "") }}
 
 {{ $enable_ipv6 := eq (or ($.Env.ENABLE_IPV6) "") "true" }}
-#-# server {
-#-# 	server_name _; # This is just an invalid value which will never trigger on a real hostname.
-#-# 	server_tokens off;
-#-# 	listen {{ $external_http_port }};
-#-# 	{{ if $enable_ipv6 }}
-#-# 	listen [::]:{{ $external_http_port }};
-#-# 	{{ end }}
-#-# 	{{ $access_log }}
-#-# 	return 503;
-#-# }
-#-# 
-#-# {{ if (and (exists "/etc/nginx/certs/default.crt") (exists "/etc/nginx/certs/default.key")) }}
-#-# server {
-#-# 	server_name _; # This is just an invalid value which will never trigger on a real hostname.
-#-# 	server_tokens off;
-#-# 	listen {{ $external_https_port }} ssl http2;
-#-# 	{{ if $enable_ipv6 }}
-#-# 	listen [::]:{{ $external_https_port }} ssl http2;
-#-# 	{{ end }}
-#-# 	{{ $access_log }}
-#-# 	return 503;
-#-# 
-#-# 	ssl_session_cache shared:SSL:50m;
-#-# 	ssl_session_tickets off;
-#-# 	ssl_certificate /etc/nginx/certs/default.crt;
-#-# 	ssl_certificate_key /etc/nginx/certs/default.key;
-#-# }
+server {
+	server_name _; # This is just an invalid value which will never trigger on a real hostname.
+	server_tokens off;
+	listen {{ $external_http_port }};
+	{{ if $enable_ipv6 }}
+	listen [::]:{{ $external_http_port }};
+	{{ end }}
+	{{ $access_log }}
+	return 503;
+}
+
+{{ if (and (exists "/etc/nginx/certs/default.crt") (exists "/etc/nginx/certs/default.key")) }}
+server {
+	server_name _; # This is just an invalid value which will never trigger on a real hostname.
+	server_tokens off;
+	listen {{ $external_https_port }} ssl http2;
+	{{ if $enable_ipv6 }}
+	listen [::]:{{ $external_https_port }} ssl http2;
+	{{ end }}
+	{{ $access_log }}
+	return 503;
+
+	ssl_session_cache shared:SSL:50m;
+	ssl_session_tickets off;
+	ssl_certificate /etc/nginx/certs/default.crt;
+	ssl_certificate_key /etc/nginx/certs/default.key;
+}
 {{ end }}
 
 {{ range $host, $containers := groupByMulti $ "Env.VIRTUAL_HOST" "," }}
@@ -377,8 +377,7 @@ server {
 	include /etc/nginx/vhost.d/default;
 	{{ end }}
 
-  include /etc/nginx/config/www.conf;
-  location / {
+	location / {
 		{{ if eq $proto "uwsgi" }}
 		include uwsgi_params;
 		uwsgi_pass {{ trim $proto }}://{{ trim $upstream_name }};
@@ -430,7 +429,6 @@ server {
 	include /etc/nginx/vhost.d/default;
 	{{ end }}
 
-	include /etc/nginx/config/www.conf;
 	location / {
 		{{ if eq $proto "uwsgi" }}
 		include uwsgi_params;
