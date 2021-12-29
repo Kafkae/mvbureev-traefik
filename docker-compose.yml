@@ -11,12 +11,12 @@ services:
       - "80:80"
       - "443:443"
     volumes:
+      - "./nginx:/etc/nginx/nginx"
+      - "./config:/etc/nginx/config"
       - "conf:/etc/nginx/conf.d"
-      - "html:/usr/share/nginx/html"
       - "vhost:/etc/nginx/vhost.d"
       - "certs:/etc/nginx/certs:ro"
-      - "./config:/etc/nginx/config"
-      - "./nginx.conf:/etc/nginx/nginx.conf"
+      - "html:/usr/share/nginx/html"
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
 
   docker-gen:
@@ -31,13 +31,13 @@ services:
     networks: 
       - "mvbureev-network"
     volumes:
+      - "./nginx:/etc/nginx/nginx"
+      - "./config:/etc/nginx/config"
+      - "./templates:/etc/docker-gen/templates:ro"
       - "conf:/etc/nginx/conf.d"
-      - "html:/usr/share/nginx/html"
       - "vhost:/etc/nginx/vhost.d"
       - "certs:/etc/nginx/certs:ro"
-      - "./templates:/etc/docker-gen/templates:ro"
-      - "./config:/etc/nginx/config"
-      - "./nginx.conf:/etc/nginx/nginx.conf"
+      - "html:/usr/share/nginx/html"
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
 
   nginx-proxy-acme:
@@ -53,13 +53,13 @@ services:
     networks: 
       - "mvbureev-network"
     volumes:
+      - "./nginx:/etc/nginx/nginx"
+      - "./config:/etc/nginx/config"
       - "acme:/etc/acme.sh"
       - "conf:/etc/nginx/conf.d"
-      - "html:/usr/share/nginx/html"
       - "vhost:/etc/nginx/vhost.d"
       - "certs:/etc/nginx/certs:rw"
-      - "./config:/etc/nginx/config"
-      - "./nginx.conf:/etc/nginx/nginx.conf"
+      - "html:/usr/share/nginx/html"
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
 
 volumes:
