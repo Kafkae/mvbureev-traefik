@@ -12,9 +12,11 @@ entryPoints:
 http:
   routers:
     http-catchall:
-      rule: 'Host(`{host:.+}`)'
-      entrypoints: http
-      middlewares: redirect-to-https
+      rule: hostregexp(`{host:.+}`)
+      entrypoints: 
+      - http
+      middlewares: 
+      - redirect-to-https
   middlewares:
     redirect-to-https:
       redirectScheme:
@@ -36,9 +38,7 @@ certificatesResolvers:
 
 providers:
   docker:
-    watch: true
-    network: web
-    # endpoint: 'unix:///var/run/docker.sock'
-    # exposedByDefault: false
+    endpoint: 'unix:///var/run/docker.sock'
+    exposedByDefault: false
   file:
     filename: traefik_dynamic.toml
