@@ -1,3 +1,3 @@
-# mvbureev-https-portal
+# mvbureev-traefik
 
-"Корень" сервиса с автоматической генерацией ssl, привязыванием доменов и поддоменов.
+traefik
