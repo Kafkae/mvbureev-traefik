@@ -16,6 +16,7 @@ services:
       - "vhost:/etc/nginx/vhost.d"
       - "certs:/etc/nginx/certs:ro"
       - "./config:/etc/nginx/config"
+      - "./nginx.conf:/etc/nginx/nginx.conf"
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
 
   docker-gen:
@@ -36,6 +37,7 @@ services:
       - "certs:/etc/nginx/certs:ro"
       - "./templates:/etc/docker-gen/templates:ro"
       - "./config:/etc/nginx/config"
+      - "./nginx.conf:/etc/nginx/nginx.conf"
       - "/var/run/docker.sock:/tmp/docker.sock:ro"
 
   nginx-proxy-acme:
