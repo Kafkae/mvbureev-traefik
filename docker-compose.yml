@@ -18,7 +18,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./data/traefik.toml:/etc/traefik/traefik.yml
       - ./data/traefik_dynamic.toml:/etc/traefik/dynamic/traefik.yml
-      - ./data/acme.json:/acme.json
+      - ./data/acme.json:/etc/traefik/acme/acme.json
     labels:
       - traefik.enable=true
       - traefik.http.routers.traefik.entrypoints=https
