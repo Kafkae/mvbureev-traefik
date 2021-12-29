@@ -5,7 +5,7 @@ services:
     image: "nginxproxy/nginx-proxy:latest"
     container_name: "reverse-proxy"
     restart: "always"
-    command: "bash -c 'touch /etc/nginx/conf.d/nginx.conf'"
+    command: "bash -c 'touch /etc/nginx/conf.d/user.conf'"
     networks: 
       - "mvbureev-network"
     ports:
@@ -13,7 +13,7 @@ services:
       - "443:443"
     volumes:
       - "./config:/etc/nginx/config"
-      - "./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf"
+      - "./nginx/nginx.conf:/etc/nginx/conf.d/user.conf"
       - "conf:/etc/nginx/conf.d"
       - "vhost:/etc/nginx/vhost.d"
       - "certs:/etc/nginx/certs:ro"
@@ -33,7 +33,7 @@ services:
       - "mvbureev-network"
     volumes:
       - "./config:/etc/nginx/config"
-      - "./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf"
+      - "./nginx/nginx.conf:/etc/nginx/conf.d/user.conf"
       - "./templates:/etc/docker-gen/templates:ro"
       - "conf:/etc/nginx/conf.d"
       - "vhost:/etc/nginx/vhost.d"
@@ -55,7 +55,7 @@ services:
       - "mvbureev-network"
     volumes:
       - "./config:/etc/nginx/config"
-      - "./nginx/nginx.conf:/etc/nginx/conf.d/nginx.conf"
+      - "./nginx/nginx.conf:/etc/nginx/conf.d/user.conf"
       - "acme:/etc/acme.sh"
       - "conf:/etc/nginx/conf.d"
       - "vhost:/etc/nginx/vhost.d"
