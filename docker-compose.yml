@@ -15,7 +15,7 @@ services:
       - --certificatesresolvers.letsencrypt.acme.email=${EMAIL}
       - --certificatesresolvers.letsencrypt.acme.storage=/letsencrypt/acme.json
     labels:
-      - traefik.http.routers.to-https.rule=HostRegexp(`{host:.+}`)
+      - traefik.http.routers.to-https.rule=HostRegexp(`traefik.${DOMAIN}`)
       - traefik.http.routers.to-https.entrypoints=http
       - traefik.http.routers.to-https.middlewares=to-https
       - traefik.http.routers.traefik.rule=Host(`traefik.${DOMAIN}`)
